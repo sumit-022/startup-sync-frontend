@@ -10,6 +10,7 @@ interface AdornmentProps {
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: boolean;
+  required?: boolean;
   helperText?: string;
   adornment?: {
     start?: AdornmentProps;
@@ -31,6 +32,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 const Input = ({
   id,
   placeholder,
+  required,
   type,
   error = false,
   helperText,
@@ -48,7 +50,7 @@ const Input = ({
   return (
     <div className="space-y-1">
       <label htmlFor={id} className="block text-sm font-medium text-gray-700">
-        {label}
+        {label} {required && <span className="text-red-500">*</span>}
       </label>
       <div className="mt-1 flex rounded-md shadow-sm">
         {adornment?.start && (
@@ -64,7 +66,7 @@ const Input = ({
           type={type}
           placeholder={placeholder}
           className={clsx(
-            "focus:ring-indigo-500 w-full focus:border-indigo-500 flex-1 block rounded-none sm:text-sm border-gray-300",
+            "focus:ring-indigo-500 w-full flex-1 block rounded-none sm:text-sm border-gray-300",
             error ? "border-red-500" : "border-gray-300",
             className
           )}

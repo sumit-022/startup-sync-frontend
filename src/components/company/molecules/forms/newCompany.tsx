@@ -1,10 +1,33 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import axios from "@/config/axios.config";
 import Input from "@/components/atoms/input";
+import { MdWebStories } from "react-icons/md";
+import Checkbox from "@/components/atoms/checkbox";
 
 const NewCompanyForm = () => {
+  const [countries, setCountries] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const response = await fetch(
+          "https://restcountries.com/v3.1/all?fields=name",
+          {
+            method: "GET",
+          }
+        );
+        const data = await response.json();
+        const countries = data.map((country: any) => country.name.common);
+        setCountries(countries.sort());
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchCountries();
+  }, []);
+
   const {
     register,
     handleSubmit,
@@ -12,6 +35,13 @@ const NewCompanyForm = () => {
   } = useForm({
     defaultValues: {
       "company-name": "",
+      website: "",
+      email: "",
+      gstin: "",
+      "street-address": "",
+      city: "",
+      state: "",
+      "postal-code": "",
     },
   });
 
@@ -41,6 +71,7 @@ const NewCompanyForm = () => {
                 <Input
                   id="company-name"
                   name="company-name"
+                  required
                   label="Company Name"
                   type="text"
                   register={register}
@@ -52,6 +83,26 @@ const NewCompanyForm = () => {
                   }}
                   error={!!errors["company-name"]}
                   helperText={errors["company-name"]?.message}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-6">
+              <div className="col-span-3 sm:col-span-2">
+                <Input
+                  id="email"
+                  required
+                  name="email"
+                  label="Email Address"
+                  type="email"
+                  register={register}
+                  rules={{
+                    required: {
+                      value: true,
+                      message: "Email Address is required",
+                    },
+                  }}
+                  error={!!errors["email"]}
+                  helperText={errors["email"]?.message}
                 />
               </div>
             </div>
@@ -78,24 +129,27 @@ const NewCompanyForm = () => {
             </div>
 
             <div className="col-span-3 sm:col-span-2">
-              <label
-                htmlFor="company-website"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Website
-              </label>
-              <div className="mt-1 flex rounded-md shadow-sm">
-                <span className="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 text-sm text-gray-500">
-                  http://
-                </span>
-                <input
-                  type="text"
-                  name="company-website"
-                  id="company-website"
-                  className="block w-full flex-1 rounded-none rounded-r-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  placeholder="www.example.com"
-                />
-              </div>
+              <Input
+                id="website"
+                required
+                name="website"
+                label="Website"
+                type="text"
+                register={register}
+                rules={{
+                  required: {
+                    value: true,
+                    message: "Website is required",
+                  },
+                  pattern: {
+                    value:
+                      /^((http|https):\/\/)?(www\.)?([a-zA-Z0-9]+)\.([a-z]{2,})$/,
+                    message: "Invalid website url",
+                  },
+                }}
+                error={!!errors["website"]}
+                helperText={errors["website"]?.message}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
@@ -113,7 +167,7 @@ const NewCompanyForm = () => {
                 </span>
                 <button
                   type="button"
-                  className="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  className="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none "
                 >
                   Change
                 </button>
@@ -142,7 +196,7 @@ const NewCompanyForm = () => {
                   <div className="flex text-sm text-gray-600">
                     <label
                       htmlFor="file-upload"
-                      className="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500"
+                      className="relative cursor-pointer rounded-md bg-white font-medium text-blue-700 hover:text-blue-600"
                     >
                       <span>Upload a file</span>
                       <input
@@ -168,7 +222,7 @@ const NewCompanyForm = () => {
         <div className="md:grid md:grid-cols-3 md:gap-6">
           <div className="md:col-span-1">
             <h3 className="text-lg font-medium leading-6 text-gray-900">
-              Personal Information
+              Demographics
             </h3>
             <p className="mt-1 text-sm text-gray-500">
               Use a permanent address where you can receive mail.
@@ -176,51 +230,22 @@ const NewCompanyForm = () => {
           </div>
           <div className="mt-5 md:col-span-2 md:mt-0">
             <div className="grid grid-cols-6 gap-6">
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="first-name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  First name
-                </label>
-                <input
-                  type="text"
-                  name="first-name"
-                  id="first-name"
-                  autoComplete="given-name"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                />
-              </div>
-
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="last-name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Last name
-                </label>
-                <input
-                  type="text"
-                  name="last-name"
-                  id="last-name"
-                  autoComplete="family-name"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                />
-              </div>
-
               <div className="col-span-6 sm:col-span-4">
-                <label
-                  htmlFor="email-address"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Email address
-                </label>
-                <input
+                <Input
+                  id="gstin"
+                  required
+                  name="gstin"
+                  label="GSTIN Number"
                   type="text"
-                  name="email-address"
-                  id="email-address"
-                  autoComplete="email"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  register={register}
+                  rules={{
+                    required: {
+                      value: true,
+                      message: "GSTIN is required",
+                    },
+                  }}
+                  error={!!errors["gstin"]}
+                  helperText={errors["gstin"]?.message}
                 />
               </div>
 
@@ -237,73 +262,86 @@ const NewCompanyForm = () => {
                   autoComplete="country-name"
                   className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                 >
-                  <option>United States</option>
-                  <option>Canada</option>
-                  <option>Mexico</option>
+                  <option>Select Country</option>
+                  {countries.map((country) => (
+                    <option key={country}>{country}</option>
+                  ))}
                 </select>
               </div>
 
               <div className="col-span-6">
-                <label
-                  htmlFor="street-address"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Street address
-                </label>
-                <input
-                  type="text"
-                  name="street-address"
+                <Input
                   id="street-address"
-                  autoComplete="street-address"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  required
+                  name="street-address"
+                  label="Street Address"
+                  type="text"
+                  register={register}
+                  rules={{
+                    required: {
+                      value: true,
+                      message: "Street Address is required",
+                    },
+                  }}
+                  error={!!errors["street-address"]}
+                  helperText={errors["street-address"]?.message}
                 />
               </div>
 
               <div className="col-span-6 sm:col-span-6 lg:col-span-2">
-                <label
-                  htmlFor="city"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  City
-                </label>
-                <input
-                  type="text"
-                  name="city"
+                <Input
                   id="city"
-                  autoComplete="address-level2"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  required
+                  name="city"
+                  label="City"
+                  type="text"
+                  register={register}
+                  rules={{
+                    required: {
+                      value: true,
+                      message: "City Name is required",
+                    },
+                  }}
+                  error={!!errors["city"]}
+                  helperText={errors["city"]?.message}
                 />
               </div>
 
               <div className="col-span-6 sm:col-span-3 lg:col-span-2">
-                <label
-                  htmlFor="region"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  State / Province
-                </label>
-                <input
+                <Input
+                  id="state"
+                  required
+                  name="state"
+                  label="State/Province"
                   type="text"
-                  name="region"
-                  id="region"
-                  autoComplete="address-level1"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  register={register}
+                  rules={{
+                    required: {
+                      value: true,
+                      message: "State/Province is required",
+                    },
+                  }}
+                  error={!!errors["state"]}
+                  helperText={errors["state"]?.message}
                 />
               </div>
 
               <div className="col-span-6 sm:col-span-3 lg:col-span-2">
-                <label
-                  htmlFor="postal-code"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  ZIP / Postal code
-                </label>
-                <input
-                  type="text"
-                  name="postal-code"
+                <Input
                   id="postal-code"
-                  autoComplete="postal-code"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  required
+                  name="postal-code"
+                  label="ZIP / Postal Code"
+                  type="text"
+                  register={register}
+                  rules={{
+                    required: {
+                      value: true,
+                      message: "ZIP / Postal Code is required",
+                    },
+                  }}
+                  error={!!errors["postal-code"]}
+                  helperText={errors["postal-code"]?.message}
                 />
               </div>
             </div>
@@ -331,34 +369,20 @@ const NewCompanyForm = () => {
                 By Email
               </div>
               <div className="mt-4 space-y-4">
-                <div className="flex items-start">
-                  <div className="flex h-5 items-center">
-                    <input
-                      id="comments"
-                      name="comments"
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label
-                      htmlFor="comments"
-                      className="font-medium text-gray-700"
-                    >
-                      Comments
-                    </label>
-                    <p className="text-gray-500">
-                      Get notified when someones posts a comment on a posting.
-                    </p>
-                  </div>
-                </div>
+                <Checkbox
+                  id="comments"
+                  labelClassName="font-medium text-gray-700"
+                  name="comments"
+                  label="Comments"
+                  register={register}
+                />
                 <div className="flex items-start">
                   <div className="flex h-5 items-center">
                     <input
                       id="candidates"
                       name="candidates"
                       type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 "
                     />
                   </div>
                   <div className="ml-3 text-sm">
@@ -379,7 +403,7 @@ const NewCompanyForm = () => {
                       id="offers"
                       name="offers"
                       type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 "
                     />
                   </div>
                   <div className="ml-3 text-sm">
@@ -409,7 +433,7 @@ const NewCompanyForm = () => {
                     id="push-everything"
                     name="push-notifications"
                     type="radio"
-                    className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="h-4 w-4 border-gray-300 text-blue-600 "
                   />
                   <label
                     htmlFor="push-everything"
@@ -423,7 +447,7 @@ const NewCompanyForm = () => {
                     id="push-email"
                     name="push-notifications"
                     type="radio"
-                    className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="h-4 w-4 border-gray-300 text-blue-600 "
                   />
                   <label
                     htmlFor="push-email"
@@ -437,7 +461,7 @@ const NewCompanyForm = () => {
                     id="push-nothing"
                     name="push-notifications"
                     type="radio"
-                    className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="h-4 w-4 border-gray-300 text-blue-600 "
                   />
                   <label
                     htmlFor="push-nothing"
@@ -454,16 +478,10 @@ const NewCompanyForm = () => {
 
       <div className="flex justify-end">
         <button
-          type="button"
-          className="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-        >
-          Cancel
-        </button>
-        <button
           type="submit"
-          className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
         >
-          Save
+          Create Company
         </button>
       </div>
     </form>

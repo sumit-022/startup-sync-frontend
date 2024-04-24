@@ -6,6 +6,7 @@ import { UseFormRegister, FieldValues, RegisterOptions } from "react-hook-form";
 interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: boolean;
   label: string;
+  labelClassName?: string;
   helperText?: string;
   rules?: Omit<
     RegisterOptions<FieldValues, string>,
@@ -19,6 +20,7 @@ interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
 const Checkbox = ({
   checked,
   label,
+  labelClassName,
   error = false,
   helperText,
   rules,
@@ -33,7 +35,7 @@ const Checkbox = ({
       <input
         type="checkbox"
         className={clsx(
-          "text-indigo-600 focus:ring-indigo-500 h-4 w-4 border-gray-300 rounded",
+          "text-blue-600 h-4 w-4 border-gray-300 rounded",
           className
         )}
         {...(register && name && register(name, rules))}
@@ -43,7 +45,10 @@ const Checkbox = ({
         }}
         {...rest}
       />
-      <label htmlFor={name} className="ml-2 block text-sm text-gray-900">
+      <label
+        htmlFor={name}
+        className={clsx("ml-3 block text-sm", labelClassName)}
+      >
         {label}
       </label>
     </div>

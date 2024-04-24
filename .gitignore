@@ -28,6 +28,11 @@ yarn-error.log*
 # local env files
 .env*.local
 
+.env*
+
+# prisma migration files
+prisma/migrations/*
+
 # vercel
 .vercel
 

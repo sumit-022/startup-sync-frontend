@@ -3,11 +3,17 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import axios from "@/config/axios.config";
 import Input from "@/components/atoms/input";
-import { MdWebStories } from "react-icons/md";
 import Checkbox from "@/components/atoms/checkbox";
+import Select from "@/components/atoms/select";
+import { AxiosError } from "axios";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 const NewCompanyForm = () => {
+  const router = useRouter();
+
   const [countries, setCountries] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -28,25 +34,61 @@ const NewCompanyForm = () => {
     fetchCountries();
   }, []);
 
+  type FormData = {
+    name: string;
+    website: string;
+    description: string;
+    email: string;
+    gstin: string;
+    address: string;
+    contact: string;
+    city: string;
+    state: string;
+    zip: string;
+    country: string;
+    logo: string;
+    cover: string;
+  };
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<FormData>({
     defaultValues: {
-      "company-name": "",
+      name: "",
       website: "",
+      description: "",
       email: "",
+      contact: "",
       gstin: "",
-      "street-address": "",
+      address: "",
       city: "",
       state: "",
-      "postal-code": "",
+      zip: "",
+      country: "",
+      logo: "",
+      cover: "",
     },
   });
 
   const onSubmit = async (data: any) => {
     console.log(data);
+
+    try {
+      setLoading(true);
+      await axios.post("/company/create", data);
+      toast.success("Company created successfully");
+      router.push("/dashboard");
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data.message);
+      } else {
+        toast.error("Something went wrong");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -70,7 +112,7 @@ const NewCompanyForm = () => {
               <div className="col-span-3 sm:col-span-2">
                 <Input
                   id="company-name"
-                  name="company-name"
+                  name="name"
                   required
                   label="Company Name"
                   type="text"
@@ -81,8 +123,8 @@ const NewCompanyForm = () => {
                       message: "Company name is required",
                     },
                   }}
-                  error={!!errors["company-name"]}
-                  helperText={errors["company-name"]?.message}
+                  error={!!errors.name}
+                  helperText={errors.name?.message}
                 />
               </div>
             </div>
@@ -116,11 +158,11 @@ const NewCompanyForm = () => {
               <div className="mt-1">
                 <textarea
                   id="about"
-                  name="about"
                   rows={3}
                   className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   placeholder="you@example.com"
                   defaultValue={""}
+                  {...register("description")}
                 />
               </div>
               <p className="mt-2 text-sm text-gray-500">
@@ -133,6 +175,9 @@ const NewCompanyForm = () => {
                 id="website"
                 required
                 name="website"
+                adornment={{
+                  start: "https://",
+                }}
                 label="Website"
                 type="text"
                 register={register}
@@ -153,7 +198,7 @@ const NewCompanyForm = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Photo
+                Company Logo
               </label>
               <div className="mt-1 flex items-center space-x-5">
                 <span className="inline-block h-12 w-12 overflow-hidden rounded-full bg-gray-100">
@@ -250,31 +295,32 @@ const NewCompanyForm = () => {
               </div>
 
               <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="country"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Country
-                </label>
-                <select
+                <Select
                   id="country"
                   name="country"
-                  autoComplete="country-name"
-                  className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                >
-                  <option>Select Country</option>
-                  {countries.map((country) => (
-                    <option key={country}>{country}</option>
-                  ))}
-                </select>
+                  label="Country"
+                  options={["Select Country", ...countries].map((country) => ({
+                    value: country === "Select Country" ? "" : country,
+                    label: country,
+                  }))}
+                  register={register}
+                  rules={{
+                    required: {
+                      value: true,
+                      message: "Country is required",
+                    },
+                  }}
+                  error={!!errors["country"]}
+                  helperText={errors["country"]?.message}
+                />
               </div>
 
               <div className="col-span-6">
                 <Input
                   id="street-address"
                   required
-                  name="street-address"
-                  label="Street Address"
+                  name="address"
+                  label="Company Address"
                   type="text"
                   register={register}
                   rules={{
@@ -283,8 +329,26 @@ const NewCompanyForm = () => {
                       message: "Street Address is required",
                     },
                   }}
-                  error={!!errors["street-address"]}
-                  helperText={errors["street-address"]?.message}
+                  error={!!errors.address}
+                  helperText={errors.address?.message}
+                />
+              </div>
+              <div className="col-span-6">
+                <Input
+                  id="contact"
+                  required
+                  name="contact"
+                  label="Company Contact Number"
+                  type="text"
+                  register={register}
+                  rules={{
+                    required: {
+                      value: true,
+                      message: "Contact Number is required",
+                    },
+                  }}
+                  error={!!errors.contact}
+                  helperText={errors.contact?.message}
                 />
               </div>
 
@@ -340,8 +404,8 @@ const NewCompanyForm = () => {
                       message: "ZIP / Postal Code is required",
                     },
                   }}
-                  error={!!errors["postal-code"]}
-                  helperText={errors["postal-code"]?.message}
+                  error={!!errors.zip}
+                  helperText={errors.zip?.message}
                 />
               </div>
             </div>

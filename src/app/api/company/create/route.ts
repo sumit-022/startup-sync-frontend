@@ -13,7 +13,6 @@ export async function POST(request: NextRequest) {
       throw new Error("Unauthorized");
     }
     const tokenData = getAuthData(request.cookies.get("token")?.value);
-
     const {
       name,
       description,
@@ -24,6 +23,7 @@ export async function POST(request: NextRequest) {
       gstin,
       logo,
       email,
+      cover,
     } = await request.json();
     const company = await prisma.company.findFirst({
       where: {
@@ -49,6 +49,7 @@ export async function POST(request: NextRequest) {
         website,
         gstin,
         logo,
+        cover,
         email,
         ownerId: tokenData.id,
       },

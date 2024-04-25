@@ -6,6 +6,7 @@ import type { Company } from "@prisma/client";
 import Image from "next/image";
 import axios from "@/config/axios.config";
 import clsx from "clsx";
+import { useRouter } from "next/navigation";
 
 const variants = {
   even: "bg-gray-50",
@@ -22,6 +23,7 @@ const companyColumnHeadings = [
 ];
 
 const CompanyTable = () => {
+  const router = useRouter();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -61,7 +63,12 @@ const CompanyTable = () => {
           : companies.map((company, index) => (
               <tr
                 key={company.id}
-                className={variants[index % 2 === 0 ? "even" : "odd"]}
+                className={
+                  (variants[index % 2 === 0 ? "even" : "odd"], "cursor-pointer")
+                }
+                onClick={() => {
+                  router.push(`/dashboard/company/${company.id}`);
+                }}
               >
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">

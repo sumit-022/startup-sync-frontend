@@ -1,16 +1,15 @@
-import { verifyToken } from "@/lib/server/auth-utils";
-import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { resolvePath } from "@/lib/resolve-path";
+import { verifyToken } from "@/lib/server/auth-utils";
 import DashboardTemplate from "@/components/templates/Dashboard";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Dashboard | Startup Sync",
-  description: "Dashboard for Startup Sync",
+  title: "New Company | Startup Sync",
 };
 
-export default function DashboardLayout({
+export default function CompanyLayout({
   children,
 }: {
   children: React.ReactNode;

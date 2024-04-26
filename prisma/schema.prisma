@@ -55,11 +55,10 @@ model Product {
   quantity    Int
   price       Float
   createdAt   DateTime @default(now())
-
-  company   Company @relation(fields: [companyId], references: [id])
-  companyId String
-  Order     Order?  @relation(fields: [orderId], references: [id])
-  orderId   String?
+  company     Company  @relation(fields: [companyId], references: [id])
+  companyId   String
+  Order       Order?   @relation(fields: [orderId], references: [id])
+  orderId     String?
 }
 
 model Order {

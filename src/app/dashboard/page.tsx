@@ -2,7 +2,7 @@ import DashboardTemplate from "@/components/templates/Dashboard";
 import prisma from "@/lib/db/prisma";
 import { resolvePath } from "@/lib/resolve-path";
 import { getAuthData, verifyToken } from "@/lib/server/auth-utils";
-import getCompanies from "@/lib/server/company-utils";
+import { getCompanies } from "@/lib/server/company-utils";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 

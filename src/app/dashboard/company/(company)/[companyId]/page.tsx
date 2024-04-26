@@ -9,7 +9,7 @@ export default async function CompanyPage({
   params: { companyId: string };
 }) {
   const token = cookies().get("token")?.value;
-  const user = getAuthData(token);
+  const user =  getAuthData(token);
   if (!user) {
     notFound();
   }

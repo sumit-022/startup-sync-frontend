@@ -1,7 +1,8 @@
 "use client";
 
-import React, { Suspense, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import SkeletonRow from "@/components/atoms/skeletons/tableRow";
+import useCompany from "@/hooks/useCompany";
 import type { Company } from "@prisma/client";
 import Image from "next/image";
 import axios from "@/config/axios.config";
@@ -24,6 +25,7 @@ const companyColumnHeadings = [
 
 const CompanyTable = () => {
   const router = useRouter();
+  const { setCompany } = useCompany();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -67,6 +69,7 @@ const CompanyTable = () => {
                   (variants[index % 2 === 0 ? "even" : "odd"], "cursor-pointer")
                 }
                 onClick={() => {
+                  setCompany(company);
                   router.push(`/dashboard/company/${company.id}`);
                 }}
               >

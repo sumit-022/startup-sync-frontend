@@ -65,6 +65,6 @@ model Product {
 model Order {
   id        String    @id @default(uuid())
   amount    Float
-  createdAt DateTime  @default(now())
   products  Product[]
+  createdAt DateTime  @default(now())
 }

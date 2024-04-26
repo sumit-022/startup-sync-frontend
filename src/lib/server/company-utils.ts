@@ -1,6 +1,8 @@
 import type { Company } from "@prisma/client";
 import prisma from "@/lib/db/prisma";
 import { AuthData } from "@/contexts/AuthContext";
+import { cookies } from "next/headers";
+import { getAuthData } from "./auth-utils";
 
 type Meta = {
   total: number;
@@ -10,7 +12,7 @@ type Meta = {
   totalPages: number;
 };
 
-export default async function getCompanies({
+export async function getCompanies({
   cursor,
   ord,
   page,
@@ -50,4 +52,18 @@ export default async function getCompanies({
     totalPages: Math.ceil(total / parseInt(limit || "10")),
   };
   return { companies, meta };
+}
+
+export async function getCompany({
+  id,
+  ownerId,
+}: {
+  id: string;
+  ownerId: string;
+}): Promise<Company | null> {
+  return await prisma.company.findFirst({
+    where: {
+      AND: [{ id }, { ownerId }],
+    },
+  });
 }

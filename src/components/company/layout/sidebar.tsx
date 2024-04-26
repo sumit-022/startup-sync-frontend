@@ -1,42 +1,74 @@
+"use client";
+import Image from "next/image";
+import useCompany from "@/hooks/useCompany";
+import CompanyDetailSkeleton from "../atoms/skeletons/company-skeleton";
+import { usePathname } from "next/navigation";
+import sidebarLinks from "@/data/company/sidebar-links";
+import Link from "next/link";
+import clsx from "clsx";
+
 export default function CompanySidebar() {
+  const { company, loading } = useCompany();
+  const pathname = usePathname().concat("/");
+  const basePath = pathname.split("/").slice(0, 4).join("/") || "/";
+  const activePath = "/".concat(pathname.split("/")[4]) || "/";
   return (
-    <div className="bg-white border-r border-gray-200 h-full">
-      <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
-          <div className="flex items-center">
-            {/* <img src="/assets/logo.svg" alt="Logo" className="h-8 w-8" /> */}
-            <span className="ml-2 text-lg font-semibold">Company</span>
-          </div>
-        </div>
-        <div className="flex-1 overflow-y-auto">
-          <nav className="px-2 mt-5">
-            <a
-              href="#"
-              className="flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-gray-200 rounded-lg"
-            >
-              Dashboard
-            </a>
-            <a
-              href="#"
-              className="flex items-center px-4 py-2 mt-2 text-sm font-medium text-gray-500 rounded-lg"
-            >
-              Employees
-            </a>
-            <a
-              href="#"
-              className="flex items-center px-4 py-2 mt-2 text-sm font-medium text-gray-500 rounded-lg"
-            >
-              Departments
-            </a>
-            <a
-              href="#"
-              className="flex items-center px-4 py-2 mt-2 text-sm font-medium text-gray-500 rounded-lg"
-            >
-              Settings
-            </a>
-          </nav>
-        </div>
+    <aside className="bg-white border-r border-gray-200 h-full w-64 max-w-64">
+      <div className="p-4 grid grid-cols-[auto,1fr] items-center">
+        {loading ? (
+          <CompanyDetailSkeleton />
+        ) : (
+          <>
+            {company?.logo ? (
+              <Image
+                src={company.logo}
+                alt={company.name}
+                width={48}
+                height={48}
+                className="rounded-md"
+              />
+            ) : (
+              <div className="w-12 h-12 bg-gray-300 rounded-md"></div>
+            )}
+            <div className="flex ml-3 flex-col">
+              <h3 className="text-lg font-semibold">{company?.name}</h3>
+              <small className="text-gray-400">{company?.email}</small>
+            </div>
+          </>
+        )}
       </div>
-    </div>
+      <nav className="mt-4">
+        <ul>
+          {sidebarLinks.map((link) =>
+            link.type === "link" && link.href ? (
+              <Link key={link.name} href={`${basePath}/${link.href}`}>
+                <li
+                  className={clsx(
+                    "p-5 flex items-center hover:bg-gray-100",
+                    activePath === link.href && "bg-gray-100"
+                  )}
+                >
+                  {link.icon}
+                  <span className="ml-2">{link.name}</span>
+                </li>
+              </Link>
+            ) : (
+              <li
+                key={link.name}
+                className={clsx(
+                  "p-5 hover:bg-gray-100",
+                  activePath === link.href && "bg-gray-100"
+                )}
+              >
+                <button className="flex items-center">
+                  {link.icon}
+                  <span className="ml-2">{link.name}</span>
+                </button>
+              </li>
+            )
+          )}
+        </ul>
+      </nav>
+    </aside>
   );
 }

@@ -46,6 +46,7 @@ model Company {
   ownerId     String
   createdAt   DateTime    @default(now())
   Inventory   Product[]
+  Order       Order[]
 }
 
 model Product {
@@ -57,13 +58,13 @@ model Product {
   createdAt   DateTime @default(now())
   company     Company  @relation(fields: [companyId], references: [id])
   companyId   String
-  Order       Order?   @relation(fields: [orderId], references: [id])
-  orderId     String?
 }
 
 model Order {
-  id        String    @id @default(uuid())
+  id        String   @id @default(uuid())
   amount    Float
-  products  Product[]
-  createdAt DateTime  @default(now())
+  createdAt DateTime @default(now())
+  client    Json
+  company   Company  @relation(fields: [companyId], references: [id])
+  companyId String
 }

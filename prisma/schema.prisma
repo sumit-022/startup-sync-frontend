@@ -30,6 +30,13 @@ enum CompanyType {
   Service
 }
 
+enum OrderStatus {
+  Active
+  Completed
+  Cancelled
+  Refunded
+}
+
 model Company {
   id          String      @id @default(uuid())
   name        String
@@ -61,10 +68,13 @@ model Product {
 }
 
 model Order {
-  id        String   @id @default(uuid())
+  id        String      @id @default(uuid())
   amount    Float
-  createdAt DateTime @default(now())
+  createdAt DateTime    @default(now())
   client    Json
-  company   Company  @relation(fields: [companyId], references: [id])
+  company   Company     @relation(fields: [companyId], references: [id])
   companyId String
+  status    OrderStatus @default(Active)
+  items     Json[]
+  payment   String
 }
